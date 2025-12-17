@@ -314,7 +314,7 @@ st.sidebar.caption("Trinity: CIO + CRO + PM")
 openai_key = st.sidebar.text_input("OpenAI Key", type="password")
 gemini_key = st.sidebar.text_input("Gemini Key", type="password")
 openai_model = st.sidebar.selectbox("CIO Model", ["gpt-5.1", "gpt-4.5-preview", "gpt-4o", "gpt-4o-mini"], index=2)
-gemini_model = st.sidebar.selectbox("CRO Model", ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"], index=0)
+gemini_model = st.sidebar.selectbox("CRO Model", ["gemini-2.5-flash-lite", "gemini-2.5-flash"], index=0)
 
 ticker = st.sidebar.selectbox("Asset", ["GC=F", "SI=F", "CL=F", "^GSPC", "^N225", "BTC-USD", "JPY=X"])
 interval = st.sidebar.selectbox("Interval", ["1h", "1d", "1wk"])
