@@ -1,0 +1,9 @@
+streamlit
+yfinance
+matplotlib
+google-generativeai
+duckduckgo-search
+scipy
+openai
+pandas
+pydantic
