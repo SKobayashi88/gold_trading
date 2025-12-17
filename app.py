@@ -212,7 +212,7 @@ def run_pseudo_backtest_multi(df: pd.DataFrame, spec: BacktestSpec, lookback_bar
 
     for i in range(len(d)):
         row = d.iloc[i]
-        H, L, C = row["High"], row["Low"], row["Close"]
+        H, L, C = float(row["High"]), float(row["Low"]), float(row["Close"])
         if positions:
             if direction == "long":
                 if L <= sl and H >= tp: close_all(i, tp if policy=="optimistic_tp_first" else sl, "TP/SL")
