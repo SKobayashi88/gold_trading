@@ -390,7 +390,7 @@ with tabs[1]:
             try:
                 genai.configure(api_key=gemini_key)
                 txt = "\n".join([f"{i['title']}" for i in get_news("US economic calendar", 5)])
-                st.session_state["calendar_report"] = genai.GenerativeModel(gemini_model).generate_content(f"Make calendar table from: {txt}").text
+                st.session_state["calendar_report"] = genai.GenerativeModel(gemini_model).generate_content(f"以下の情報から経済指標カレンダーを日本語で作成してください。表形式で日付、イベント名、重要度を含めてください: {txt}").text
             except Exception as e:
                 if "ResourceExhausted" in str(type(e).__name__) or "429" in str(e) or "quota" in str(e).lower():
                     st.error("🚫 APIレート制限に達しました。1分ほど待ってから再試行してください。")
@@ -402,7 +402,7 @@ with tabs[1]:
         else:
             try:
                 genai.configure(api_key=gemini_key)
-                st.session_state["gemini_analysis"] = genai.GenerativeModel(gemini_model).generate_content(f"Briefing for {ticker}. Data: {ctx}").text
+                st.session_state["gemini_analysis"] = genai.GenerativeModel(gemini_model).generate_content(f"{ticker}の市場分析レポートを日本語で作成してください。現在価格、テクニカル分析、リスク要因、今後の見通しを含めてください。データ: {ctx}").text
             except Exception as e:
                 if "ResourceExhausted" in str(type(e).__name__) or "429" in str(e) or "quota" in str(e).lower():
                     st.error("🚫 APIレート制限に達しました。1分ほど待ってから再試行してください。")
@@ -465,7 +465,10 @@ with tabs[3]:
         st.dataframe(st.session_state["last_mets"])
         pk = st.selectbox("View", list(st.session_state["last_logs"].keys()))
         row = st.session_state["last_mets"][st.session_state["last_mets"]["strategy"]==pk].iloc[0]
-        if "equity_curve" in row: st.line_chart(row["equity_curve"])
+        if "equity_curve" in row and row["equity_curve"] is not None:
+            ec = row["equity_curve"]
+            if isinstance(ec, list) and len(ec) > 0:
+                st.line_chart(pd.DataFrame({"Equity": ec}))
         c1, c2 = st.columns(2)
         with c1: 
             if st.button("Run Grid Search"):
@@ -497,7 +500,7 @@ Gemini AI（CRO=最高リスク管理責任者）がバックテスト結果を�
     if not st.session_state["last_mets"].empty and gemini_key and st.button("Request Audit"):
         genai.configure(api_key=gemini_key)
         mets_json = st.session_state["last_mets"].to_json(orient="records")
-        p = f"Role: CRO. Audit these backtest results: {mets_json}. Market Vol: {ctx['vol']}. Verdict?"
+        p = f"あなたはCRO（最高リスク管理責任者）です。以下のバックテスト結果を日本語で監査してください。勝率、リスク・リワード比、ドローダウンの評価、総合判定を含めてください。バックテスト結果: {mets_json}. 現在のボラティリティ: {ctx['vol']}%"
         st.session_state["validation_result"] = genai.GenerativeModel(gemini_model).generate_content(p).text
     st.markdown(st.session_state.get("validation_result", ""))
 
