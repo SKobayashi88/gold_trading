@@ -394,7 +394,7 @@ with tabs[2]:
             with st.spinner("CIO thinking..."):
                 try:
                     resp = client.beta.chat.completions.parse(model=openai_model, messages=[{"role":"user","content":f"Generate {n_s} strategies for {ticker} based on {ctx}. Return JSON."}], response_format=MultiStrategyReport)
-                    st.session_state["multi_report"] = resp.output_parsed
+                    st.session_state["multi_report"] = resp.choices[0].message.parsed
                     st.success("Done")
                 except Exception as e: st.error(e)
     if st.session_state["multi_report"]: st.json(st.session_state["multi_report"].model_dump())
