@@ -430,7 +430,30 @@ OpenAI（CIO=最高投資責任者）が市場データを分析し、具体的�
             client = OpenAI(api_key=openai_key)
             with st.spinner("CIO thinking..."):
                 try:
-                    resp = client.beta.chat.completions.parse(model=openai_model, messages=[{"role":"user","content":f"Generate {n_s} strategies for {ticker} based on {ctx}. Return JSON."}], response_format=MultiStrategyReport)
+                    cio_prompt = f"""Generate {n_s} trading strategies for {ticker}.
+
+CRITICAL CONSTRAINTS (MUST FOLLOW):
+1. Entry price MUST be within ±2% of current price ({ctx['price']:.2f})
+   - Long entry: between {ctx['price']*0.98:.2f} and {ctx['price']*1.01:.2f}
+   - Short entry: between {ctx['price']*0.99:.2f} and {ctx['price']*1.02:.2f}
+
+2. Stop loss distance: 1-3% from entry price
+3. Take profit distance: 2-5% from entry price
+4. Risk/Reward ratio should be at least 1:1.5
+
+Market Context:
+- Current Price: {ctx['price']:.2f}
+- Volatility: {ctx['vol']:.2f}%
+- Support: {ctx['support']:.2f}
+- Resistance: {ctx['resistance']:.2f}
+- Pattern: {ctx['pattern']}
+- Horizon: {ctx['horizon']}
+
+News Summary:
+{ctx['news']}
+
+Return JSON with executable backtest parameters."""
+                    resp = client.beta.chat.completions.parse(model=openai_model, messages=[{"role":"user","content":cio_prompt}], response_format=MultiStrategyReport)
                     st.session_state["multi_report"] = resp.choices[0].message.parsed
                     st.success("Done")
                 except Exception as e: st.error(e)
